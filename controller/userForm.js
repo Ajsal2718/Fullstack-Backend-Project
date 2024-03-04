@@ -19,11 +19,15 @@ const userSignUp = async (req, res) => {
   if (!findEmail) {
     client.verify.v2
       .services(verifySid)
-      .verifications.create({ to: phone, channel: "sms" })
+      .verifications.create({ to:phone, channel: "sms" })
       .then((verification) => {
         console.log(verification.status);
         if (verification.status == "pending") {
+
+          let otpToken = jwt( verification.code);
+          res.cookie("otp",otpToken);
           res.status(200).send("Success");
+
         }
       })
       .catch((err) => {
@@ -49,7 +53,7 @@ const verifyOtp = async (req, res) => {
         let newUser = await userModel.create(user);
         console.log(newUser);
         let token = jwt(newUser.email);
-        res.cookie("UserToken", token);
+        res.cookie("UserToken",token);
         res
           .status(200)
           .json({ status: "Success", userDetials: newUser, token: token });
