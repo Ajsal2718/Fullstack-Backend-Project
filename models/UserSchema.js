@@ -16,21 +16,17 @@ const UserSchema = mongoose.Schema(
             type:String,
             required:true
         },
-        // confirmPassword: {
-        //     type: String,
-        //     required: [true, 're enter your password'],
-        //     //only work for save and create
-        //     validate: {
-        //         validator: function (val) {
-        //             return val === this.password
-        //         },
-        //         message: 'Password and confirm password is not same'
-        //     }
-        // },
-        // isAdmin:{
-        //     type:Boolean,
-        //     default:false
-        // }
+        address:{
+            type:Object,
+        },
+        cart:Array,
+        wishlist:Array,
+        orders:[
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                ref: 'Order'
+            }
+        ]
     },
     {
         timestamps:true

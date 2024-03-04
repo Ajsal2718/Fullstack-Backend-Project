@@ -1,18 +1,12 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = {
-  signToken: (userId) => {
-    return new Promise((resolve, reject) => {
-      const payload = {
-        name: userId,
-      };
-    });
-    jwt.sign(payload, secret, (err, token) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(token);
-      }
-    });
-  },
-};
+module.exports = function generate(id,username){
+  const payload = {
+    id: id,
+    username: username,
+  }
+  const secretkey = process.env.JWT_KEY;
+  const options = {expiresIn:"12h"};
+
+  return jwt.sign(payload,secretkey,options)
+}

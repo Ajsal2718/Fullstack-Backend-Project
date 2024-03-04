@@ -14,9 +14,16 @@ const productSchema = new Schema({
     category:{
         type: String,
     },
+    subcategory:{
+        type:String,
+    },
     Image:{
         type:String,
     },
+    qty:{
+        type:Number, 
+        default:1
+    }
 },
 {timestamps:true}
 );

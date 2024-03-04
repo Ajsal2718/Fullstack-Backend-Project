@@ -1,12 +1,14 @@
 const express = require("express");
+const cors = require('cors')
 const app = express();
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config/config.env" });
 
 const cookies = require("cookie-parser");
+app.use(cors())
 
 ///////////// DB Connection //////////
-const dotenv = require("dotenv");
 const dbConnect = require("./config/dbConnect");
-dotenv.config({ path: "./config/config.env" });
 dbConnect();
 
 app.use(express.json());
@@ -36,6 +38,6 @@ app.listen(process.env.PORT, (err) => {
   if (err) {
     console.log(err);
   } else {
-    console.log("Successfull")
+    console.log("Server Runnin On Port:"+process.env.PORT);
   }
 });
