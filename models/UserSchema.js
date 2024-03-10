@@ -5,7 +5,8 @@ const UserSchema = mongoose.Schema(
     {
         username:{
             type:String,
-            required:true,   
+            required:true, 
+            trim:true  
         },
         email:{
             type:String,
@@ -15,9 +16,6 @@ const UserSchema = mongoose.Schema(
         password:{
             type:String,
             required:true
-        },
-        phone:{
-            type:Number,
         },
         address:{
             type:Object,

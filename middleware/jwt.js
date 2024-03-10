@@ -1,12 +1,16 @@
 const jwt = require("jsonwebtoken");
+exports.signAccessToken = (userData) => {
+    return new Promise((resolve, reject) => {
+      const payload = { userData };
+      const secretkey = process.env.JWT_KEY;
+      const options = { expiresIn: "12h" };
+    });
 
-module.exports = function generate(id,username){
-  const payload = {
-    id: id,
-    username: username,
+    jwt.sign(payload, secret, options, (err, token) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(token);
+      }
+    });
   }
-  const secretkey = process.env.JWT_KEY;
-  const options = {expiresIn:"12h"};
-
-  return jwt.sign(payload,secretkey,options)
-}

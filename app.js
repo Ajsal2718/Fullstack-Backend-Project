@@ -16,8 +16,13 @@ app.use(cookies());
 
 
 
-const userformRoute = require("./routes/userRouter");
-app.use("/api", userformRoute);
+const userRoute = require("./routes/userRouter");
+app.use("/api",userRoute);
+const otpRoutes = require('./routes/otpRoutes');
+app.use('/api',otpRoutes)
+const autheRoute = require('./routes/authRoute')
+app.use('/api',autheRoute)
+
 
 // const cors = require('cors')
 // app.use(cors({
