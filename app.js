@@ -5,7 +5,10 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
 
 const cookies = require("cookie-parser");
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:2718',
+  credentials: true
+}));
 
 ///////////// DB Connection //////////
 const dbConnect = require("./config/dbConnect");
@@ -18,10 +21,10 @@ app.use(cookies());
 
 const userRoute = require("./routes/userRouter");
 app.use("/api",userRoute);
-const otpRoutes = require('./routes/otpRoutes');
-app.use('/api',otpRoutes)
-const autheRoute = require('./routes/authRoute')
-app.use('/api',autheRoute)
+// const otpRoutes = require('./routes/otpRoutes');
+// app.use('/api',otpRoutes)
+// const autheRoute = require('./routes/authRoute')
+// app.use('/api',autheRoute)
 
 
 // const cors = require('cors')

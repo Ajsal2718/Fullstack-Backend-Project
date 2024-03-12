@@ -4,7 +4,7 @@ const User = require('../models/UserSchema')
 
 exports.sendOTP = async (req, res) => {
     try {
-      const { email } = req.body;
+      const {username,email,password } = req.body;
       // Check if user is already present
       const checkUserPresent = await User.findOne({ email });
       // If user found with provided email
