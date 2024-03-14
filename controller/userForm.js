@@ -6,12 +6,6 @@ const { signToken } = require("../middleware/jwt");
 const { tryCatch } = require("../middleware/trycatchHandler");
 const nodemailer = require("nodemailer");
 const configJs = require("../config/config");
-// config() // Load environment variables from .env file
-
-// const accountSid = process.env.TWILO_ACCOUNT;
-// const authToken = process.env.TWILO_AUTH_TOKEN;
-// const verifySid = process.env.TWILO_VERIFY_SID;
-// const client = require("twilio")(accountSid, authToken);
 
 /////////////// Send OTP to customer email /////////////////
 const transporter = nodemailer.createTransport({
@@ -22,13 +16,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// const generatedOtp = () => {
-//   return Math.floor(1000 + Math.random() * 9000);
-// };
 const generatedOtp = Math.floor(1000 + Math.random() * 9000);
 
 const userSignUp = async (req, res) => {
-
   try {
     const { email } = req.body;
     console.log(email);
@@ -74,21 +64,9 @@ const userSignUp = async (req, res) => {
 /////////////////// Verify the OTP from the user //////////////
 const registerUser = tryCatch(async (req, res) => {
   const { otp } = req.body;
-  // console.log(otp);
-  // const { username, email, password } = req.body;
-  // console.log(username);
-
   const otpCookie = req.cookies.otp;
-  console.log( otpCookie);
-  // const checkUser = await userModel.find({ email: email });
+  console.log(otpCookie);
 
-  // if (!checkUser) {
-  //   res.status(400).json({
-  //     message: "Email already exists",
-  //     success: false,
-  //   });
-  //   return;
-  // }
   const otpValid = otpCookie === otp;
   // console.log(otpCookie);
   if (!otpValid) {
@@ -99,12 +77,6 @@ const registerUser = tryCatch(async (req, res) => {
     return;
   }
   res.clearCookie("otp");
-  // let hashedPassword = await bcrypt.hash(password, 10);
-  // const Users = await userModel.create({
-  //   username,
-  //   email,
-  //   password,
-  // });
   res.status(200).json({
     // data: Users._id,
     message: "Register Successfully! Please Login.",
@@ -127,7 +99,7 @@ const UserLogin = tryCatch(async (req, res) => {
   // console.log(checkUser.password);
 
   const passwordMatch = await bcrypt.compare(password, checkUser.password);
-  
+
   if (!passwordMatch) {
     return res.status(400).json({
       success: false,
@@ -162,7 +134,6 @@ const logoutUser = tryCatch(async (req, res) => {
   });
 });
 
-
 ////////////// Show Products /////////////////
 
 const GetProducts = tryCatch(async (req, res) => {
@@ -175,28 +146,25 @@ const GetProducts = tryCatch(async (req, res) => {
   } else {
     res.status(201).json({
       message: "Success",
-      productData
+      productData,
     });
   }
 });
 
-
-
-
-
-
-
+/////////////////Get ProductId /////////////
+const getProductById = async (req, res) => {
+  const id = req.params.id;
+  const product = await productModel.findById(id);
+  return res.status(200).json(product);
+};
 
 
 /////////////////Get UserId /////////////
-const getUserID = tryCatch(async (req, res) => {
-  let id = req.params.id;
-  let userData = await userModel.findById(id);
-  return res.status(200).json(userData);
-});
-
-
-
+// const getUserID = tryCatch(async (req, res) => {
+//   let id = req.params.id;
+//   let userData = await userModel.findById(id);
+//   return res.status(200).json(userData);
+// });
 
 module.exports = {
   userSignUp,
@@ -204,5 +172,6 @@ module.exports = {
   UserLogin,
   logoutUser,
   GetProducts,
-  getUserID,
+  getProductById,
+  // getUserID,
 };

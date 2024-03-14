@@ -8,6 +8,7 @@ router.route('/otpverify').post(controller.registerUser);
 router.route("/login").post(controller.UserLogin);
 router.route('/logout').get(controller.logoutUser);
 router.route('/getproduct').get(controller.GetProducts);
-router.route('/getuser/:id').get(controller.getUserID);
+router.route('/getproductId/:id').get(controller.getProductById);
+// router.route('/getuser/:id').get(controller.getUserID);
 
 module.exports = router;
