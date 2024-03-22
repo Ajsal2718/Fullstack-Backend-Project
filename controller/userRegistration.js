@@ -134,29 +134,6 @@ const logoutUser = tryCatch(async (req, res) => {
   });
 });
 
-////////////// Show Products /////////////////
-
-const GetProducts = tryCatch(async (req, res) => {
-  const productData = await productModel.find();
-  if (!productData) {
-    res.status(401).json({
-      success: false,
-      message: "No products in here",
-    });
-  } else {
-    res.status(201).json({
-      message: "Success",
-      productData,
-    });
-  }
-});
-
-/////////////////Get ProductId /////////////
-const getProductById = async (req, res) => {
-  const id = req.params.id;
-  const product = await productModel.findById(id);
-  return res.status(200).json(product);
-};
 
 
 /////////////////Get UserId /////////////
@@ -171,7 +148,4 @@ module.exports = {
   registerUser,
   UserLogin,
   logoutUser,
-  GetProducts,
-  getProductById,
-  // getUserID,
 };
