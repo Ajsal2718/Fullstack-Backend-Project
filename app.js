@@ -1,6 +1,6 @@
 const express = require("express");
-const cors = require('cors')
 const app = express();
+const cors = require('cors')
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
 
@@ -14,13 +14,17 @@ app.use(cors({
 const dbConnect = require("./config/dbConnect");
 dbConnect();
 
-app.use(express.json());
 app.use(cookies());
+app.use(express.urlencoded({ extended: false }))
+app.use(express.json());
 
-
-
+////////////// User  Routes /////////////
 const userRoute = require("./routes/userRouter");
 app.use("/api",userRoute);
+
+///////////// Admin Routes ////////////
+const adminRoute = require('./routes/adminRouter');
+app.use('/api',adminRoute)
 
 ///////// Localhost Port //////////////
 app.listen(process.env.PORT, (err) => {
