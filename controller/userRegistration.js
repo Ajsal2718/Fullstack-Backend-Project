@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
-const userModel = require("../models/UserSchema");
-const otpGenerate = require("../utils/otpGenerator");
-const productModel = require("../models/productSchema");
+const {userModel} = require("../models/UserSchema");
+// const otpGenerate = require("../utils/otpGenerator");
+// const productModel = require("../models/productSchema");
 const { signToken } = require("../middleware/jwt");
 const { tryCatch } = require("../middleware/trycatchHandler");
 const nodemailer = require("nodemailer");

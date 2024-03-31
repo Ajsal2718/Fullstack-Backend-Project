@@ -2,9 +2,10 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const userModel = require("../models/UserSchema");
 const productModel = require("../models/productSchema");
-const { signToken } = require("../middleware/jwt");
+// const { signToken } = require("../middleware/jwt");
 const { tryCatch } = require("../middleware/trycatchHandler");
-const { use } = require("../routes/userRouter");
+const userSrvc = require('../services/authContoll')
+// const { use } = require("../routes/userRouter");
 
 ////////////// Show Products /////////////////
 
@@ -48,30 +49,40 @@ const getProductByCategory = tryCatch(async (req, res) => {
   }
 });
 
-////////////// add product to the user cart ///////////
+//////////// add product to the user cart ///////////
+// const addToCart = tryCatch(async (req, res) => {
+//   const { id: userId } = req.params;
+//   const { id: productId } = req.body;
+
+//   const addProduct = await productModel.findById(productId);
+//   const checkUser = await userModel.findById(userId);
+
+//   if (!addProduct && !checkUser) {
+//     res.status(404).json({
+//       success: false,
+//       message: "user id or may product id get inccorrect",
+//     });
+//   } else {
+//     const isExist = checkUser.cart.find((item) => item.id == productId);
+//     if (isExist) {
+//       res.status(404).send("This product already exist in your cart");
+//     } else {
+//       checkUser.cart.push(addProduct);
+//       console.log(addProduct);
+//       await checkUser.save();
+//       res.status(200).json(checkUser);
+//     }
+//   }
+// });
+
+
+//////////// add product to the user cart ///////////
 const addToCart = tryCatch(async (req, res) => {
-  const { id: userId } = req.params;
-  const { id: productId } = req.body;
-
-  const addProduct = await productModel.findById(productId);
-  const checkUser = await userModel.findById(userId);
-
-  if (!addProduct && !checkUser) {
-    res.status(404).json({
-      success: false,
-      message: "user id or may product id get inccorrect",
-    });
-  } else {
-    const isExist = checkUser.cart.find((item) => item.id == productId);
-    if (isExist) {
-      res.status(404).send("This product already exist in your cart");
-    } else {
-      checkUser.cart.push(addProduct);
-      await checkUser.save();
-      res.status(200).json(checkUser);
-    }
-  }
-});
+  const userId = req.params.id
+  const productId = req.body.productId;
+  console.log(productId);
+  userSrvc.addToCartProduct(userId, productId,res)
+})
 
 ///////////////// View Prodcut From  User Cart ///////////
 const viewFromCart = tryCatch(async (req, res) => {

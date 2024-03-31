@@ -2,6 +2,8 @@ const userModel = require("../models/UserSchema");
 const productModel = require("../models/productSchema");
 const { accessToken } = require("../middleware/jwt");
 const { tryCatch } = require("../middleware/trycatchHandler");
+const cloudinary = require("../utils/cloudinery");
+const jwt = require("jsonwebtoken");
 
 /////////////////// Admin Login ////////////////
 const adminLogin = tryCatch(async (req, res) => {
@@ -11,17 +13,26 @@ const adminLogin = tryCatch(async (req, res) => {
   };
   const { username, password } = req.body;
   const validator = password === admin.password && username === admin.username;
-  // console.log(validator);
+  if (!validator)
+    return res.status(401).send("validati failed:Invalid Username or Password");
 
-  if (validator) {
-    // console.log('login Success');
-    res
-      .status(200)
-      .cookie("AdminAuth", accessToken)
-      .json({ success: true, message: "Successfully Logged In!" });
-  } else {
-    res.status(400).send("validation failed:Invalid Username or Password");
+  const accessToken = jwt.sign({ username: username }, process.env.JWT_KEY);
+  console.log(accessToken);
+  res.cookie("adminAuth", accessToken);
+  const token = req.cookies.adminAuth;
+
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Failed to set cookie",
+    });
   }
+
+  res.status(200).json({
+    success: true,
+    message: "Logged in Successfully!",
+    accessToken,
+  });
 });
 
 /////////////////// View all users ///////////////////
@@ -98,6 +109,59 @@ const productsCategory = tryCatch(async (req, res) => {
   }
 });
 
+///////////////// Add product in mongodb /////////////////
+const addproducts = tryCatch(async (req, res) => {
+  const { title, description, price, category, qty } = req.body;
+  const existingproduct = await productModel.findOne({ title: title });
+
+  if (!existingproduct) {
+    const adding = await cloudinary.uploader.upload(req.file.path);
+    const added = await productModel.create({
+      title,
+      description,
+      price,
+      category,
+      Image: adding.url,
+    });
+    res.status(200).json({
+      success: true,
+      message: "Product has been created",
+      data: added,
+    });
+  } else {
+    res.status(404).json({
+      success: false,
+      message: "This product already exists",
+    });
+  }
+});
+
+////////////////// Update Products ////////////
+const updateProducts = tryCatch(async (req, res) => {
+  const productId = req.params.id;
+  const isExist = await productModel.findById(productId);
+  const { title, description, price, qty } = req.body;
+
+  if (isExist) {
+    const adding = await cloudinary.uploader.upload(req.file.path);
+    const product = await productModel.findById(productId);
+
+    product.title = title || product.title;
+    product.description = description || product.description;
+    product.price = price || product.price;
+    product.category = category || product.category;
+    product.qty = qty || product.qty;
+    product.Image = adding.url || product.Image;
+
+    await product.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "The product has been updated successfully!",
+      data: product,
+    });
+  }
+});
 ///////////////// Product Delete /////////////
 
 const productDelete = tryCatch(async (req, res) => {
@@ -125,5 +189,7 @@ module.exports = {
   displayProduct,
   ProductById,
   productsCategory,
-  productDelete
+  productDelete,
+  addproducts,
+  updateProducts,
 };

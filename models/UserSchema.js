@@ -20,12 +20,22 @@ const UserSchema = mongoose.Schema(
         address:{
             type:Object,
         },
-        cart:Array,
-        wishlist:Array,
+        // cart:[
+        //     {
+        //         type:mongoose.Schema.Types.ObjectId,
+            
+        //     }
+        // ],
+        wishlist:[
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                // ref:'whislist'
+            }
+        ],
         orders:[
             {
                 type:mongoose.Schema.Types.ObjectId,
-                ref: 'Order'
+                // ref: 'Order'
             }
         ]
     },
