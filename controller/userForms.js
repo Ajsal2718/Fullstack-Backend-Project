@@ -2,9 +2,9 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const userModel = require("../models/UserSchema");
 const productModel = require("../models/productSchema");
+const cartModel = require('../models/cartShema')
 // const { signToken } = require("../middleware/jwt");
 const { tryCatch } = require("../middleware/trycatchHandler");
-const userSrvc = require('../services/authContoll')
 // const { use } = require("../routes/userRouter");
 
 ////////////// Show Products /////////////////
@@ -75,14 +75,59 @@ const getProductByCategory = tryCatch(async (req, res) => {
 //   }
 // });
 
-
 //////////// add product to the user cart ///////////
-const addToCart = tryCatch(async (req, res) => {
-  const userId = req.params.id
-  const productId = req.body.productId;
-  console.log(productId);
-  userSrvc.addToCartProduct(userId, productId,res)
-})
+// const addToCart = tryCatch(async (req, res) => {
+//   const userId = req.params.id
+//   const productId = req.body.productId;
+//   console.log(productId);
+//   userSrvc.addToCartProduct(userId, productId,res)
+// })
+
+const addToCart = async (req,res) => {
+  let userId = req.params.id;
+  let productId = req.body;
+  const productFind = await productModel.findById(productId);
+  // console.log(productFind);
+  const userFind = await userModel.findById(userId);
+  // console.log(userFind);
+  const existingUser = await cartModel.findOne({userId:userId });
+  const existingProduct = await cartModel.findOne({userId: userId,products: productId});
+  // console.log(existingUser);
+  if (existingProduct) {
+    res.status(200).json({
+      status: "Success",
+      message: "This Product is already in your Cart",
+    });
+  }
+  if (!userFind || !productFind) {
+    res.status(404).send("This product already exist in your cart");
+  } else {
+    if (existingUser && !existingProduct) {
+      existingUser.products.push(productId);
+      existingUser.totalPrice += productId.price;
+      await existingUser.save();
+      res.status(200).json({
+        status: "success",
+        message: "Added to Your Cart Successfully!",
+        // cart: existingUser,
+        // totalProduct: existingUser.products.length,
+      });
+    } else {
+      ////// new User ////////
+      // const addingCart = await cartModel.create({
+      //   userId: userId,
+      //   products: [productId],
+      //   totalPrice: productFind.price,
+      // });
+      // res.status(200).json({
+      //   status: "Created a New Cart for this User",
+      //   message: "The Item has been added to the new Cart",
+      //   // cart: addingCart,
+      //   // totalProduct: addingCart.products.length,
+      // });
+    }
+  }
+};
 
 ///////////////// View Prodcut From  User Cart ///////////
 const viewFromCart = tryCatch(async (req, res) => {
@@ -193,21 +238,23 @@ const placeOrder = tryCatch(async (req, res) => {
     });
   }
   const { cart } = userCheck;
-  if(cart.length === 0){
+  if (cart.length === 0) {
     return res.status(404).json({
-        success:false,
-        message:'Your Cart Is Empty'
-    })
+      success: false,
+      message: "Your Cart Is Empty",
+    });
   } else {
-    const totalPrice =  cart.reduce((acc,product) => {
+    const totalPrice = cart
+      .reduce((acc, product) => {
         return acc + product.price;
-    },0).toFixed(2)
+      }, 0)
+      .toFixed(2);
     return res.status(200).json({
-        success:true,
-        message: `the total amount you have to pay ${totalPrice}`,
-        products:`${cart.length},Products`,
-        data:cart
-    })
+      success: true,
+      message: `the total amount you have to pay ${totalPrice}`,
+      products: `${cart.length},Products`,
+      data: cart,
+    });
   }
 });
 module.exports = {
@@ -219,5 +266,5 @@ module.exports = {
   addToWishlist,
   viewFromWishlist,
   removeFromWishlist,
-  placeOrder
+  placeOrder,
 };
